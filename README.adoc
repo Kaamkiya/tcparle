@@ -14,7 +14,8 @@ Currently, it's built entirely with just the standard library.
 == Commands
 
 * `/room [room]`: Join a room. Rooms will be created if they do not exist. If
-  no arguments are given, all rooms will be listed
+  no arguments are given, it will print your current room.
+* `/rooms`: List all rooms.
 * `/nick [name]`: Change your display name.
 * `/quit`: Leave the chat
 
@@ -28,7 +29,6 @@ your room.
 * Delete empty rooms (except main)
 * Validate room names
 * Add a prompt with this format: `[user]:`
-* Make `/rooms` list rooms and `/room` show the current room
 * Make a `/typing` command that gives a typing test and broadcasts user's
   results
 

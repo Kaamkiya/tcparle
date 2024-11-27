@@ -55,6 +55,8 @@ func (srv *Server) RunCommands() {
 			srv.cmdQuit(cmd.Args, cmd.Client)
 		case CmdRoom:
 			srv.cmdRoom(cmd.Args, cmd.Client)
+		case CmdRooms:
+			srv.cmdRooms(cmd.Args, cmd.Client)
 		case CmdMsg:
 			srv.cmdMsg(cmd.Args, cmd.Client)
 		case CmdUsers:
@@ -85,15 +87,18 @@ func (srv *Server) cmdNick(args []string, c *Client) {
 	}
 }
 
+func (srv *Server) cmdRooms(_ []string, c *Client) {
+	c.Msg("Here's a list of all the rooms:")
+	for roomName, _ := range srv.Rooms {
+		c.Msg(roomName)
+	}
+}
+
 func (srv *Server) cmdRoom(args []string, c *Client) {
 	if len(args) < 2 {
-		c.Msg("Here's a list of all the rooms:")
-		for roomName, _ := range srv.Rooms {
-			c.Msg(roomName)
-		}
+		c.Msg(fmt.Sprintf("You're currently in %s", c.Room.Name))
 		return
 	}
-
 	roomName := args[1]
 	r, ok := srv.Rooms[roomName]
 
