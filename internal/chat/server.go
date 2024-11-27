@@ -67,7 +67,9 @@ func (srv *Server) cmdNick(args []string, c *Client) {
 				return
 			}
 		}
+		if c.Room != nil {
 		c.Room.Broadcast(c, fmt.Sprintf("%s is now %s.", c.Nick, newNick))
+		}
 		c.Nick = newNick
 		c.Msg("You have been renamed.")
 	} else {
