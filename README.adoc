@@ -21,6 +21,19 @@ Currently, it's built entirely with just the standard library.
 If you don't specify a command, whatever you type will be sent to everyone in
 your room.
 
+== Roadmap
+
+* Color the usernames
+* Add a `/help` command
+* Add a `/users` command that lists users in the current room
+* Set the rooms to `main` by default
+* Delete empty rooms (except main)
+* Validate room names
+* Add a prompt with this format: `[user]:`
+* Make `/rooms` list rooms and `/room` show the current room
+* Make a `/typing` command that gives a typing test and broadcasts user's
+  results
+
 == License
 
 This project uses the Unlicense. See https://unlicense.org for more info.
