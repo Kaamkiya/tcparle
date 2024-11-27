@@ -1,0 +1,26 @@
+= tcparle
+
+Chat over TCP. Name is TCP + "parle", which is French for talk.
+
+You can connect with `telnet`:
+
+[source,bash]
+----
+$ telnet $HOST:$PORT
+----
+
+Currently, it's built entirely with just the standard library.
+
+== Commands
+
+* `/room [room]`: Join a room. Rooms will be created if they do not exist. If
+  no arguments are given, all rooms will be listed
+* `/nick [name]`: Change your display name.
+* `/quit`: Leave the chat
+
+If you don't specify a command, whatever you type will be sent to everyone in
+your room.
+
+== License
+
+This project uses the Unlicense. See https://unlicense.org for more info.

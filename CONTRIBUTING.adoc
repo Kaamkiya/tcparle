@@ -1,0 +1,16 @@
+= Contributing
+
+All contributions are welcome, whether it be documentation, making the code
+more readable, adding features, fixing bugs, or anything else.
+
+There are some guidelines, however.
+
+== Guidelines
+
+* All code must be properly formatted (do this with `go fmt ./...`) *before*
+  making a pull request
+* Make sure all code is *functional* before creating a pull request
+* Code must be *readable*
+* Comments should explain why something is done, not how
+* For documentation: docs should be written in https://asciidoc.org[AsciiDoc]
+
