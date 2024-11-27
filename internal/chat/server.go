@@ -37,6 +37,12 @@ func (srv *Server) NewClient(conn net.Conn) {
 		Commands: srv.Commands,
 	}
 
+	c.Commands <- Command{
+		ID: CmdRoom,
+		Client: c,
+		Args: []string{"/room", "main"},
+	}
+
 	c.readInput()
 }
 
