@@ -51,6 +51,8 @@ func (srv *Server) RunCommands() {
 			srv.cmdRoom(cmd.Args, cmd.Client)
 		case CmdMsg:
 			srv.cmdMsg(cmd.Args, cmd.Client)
+		case CmdUsers:
+			srv.cmdUsers(cmd.Args, cmd.Client)
 		}
 	}
 }
@@ -127,9 +129,22 @@ func (srv *Server) cmdMsg(args []string, c *Client) {
 	c.Room.Broadcast(c, c.Nick+": "+strings.Join(args, " "))
 }
 
+func (srv *Server) cmdUsers(args []string, c *Client) {
+	if c.Room == nil {
+		c.Err(fmt.Errorf("You must be in a room."))
+		return
+	}
+
+	c.Msg("Users: ")
+	for _, user := range c.Room.Members {
+		c.Msg(fmt.Sprintf("* %s", user.Nick))
+	}
+}
+
 func (srv *Server) quitCurrentRoom(c *Client) {
 	if c.Room != nil {
 		delete(c.Room.Members, c.Conn.RemoteAddr())
 		c.Room.Broadcast(c, fmt.Sprintf("%s has left the room.", c.Nick))
 	}
 }
+

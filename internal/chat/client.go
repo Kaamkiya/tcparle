@@ -57,6 +57,12 @@ func (c *Client) readInput() {
 				Client: c,
 				Args: args,
 			}
+		case "/users":
+			c.Commands <- Command{
+				ID: CmdUsers,
+				Client: c,
+				Args: args,
+			}
 		default:
 			if cmd[0] == '/' {
 				c.Err(fmt.Errorf("No such command %s", cmd))

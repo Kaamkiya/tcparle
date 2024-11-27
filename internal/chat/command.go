@@ -7,6 +7,7 @@ const (
 	CmdRoom
 	CmdQuit
 	CmdMsg
+	CmdUsers
 )
 
 type Command struct {
