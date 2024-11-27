@@ -12,7 +12,7 @@ const (
 )
 
 type Command struct {
-	ID CommandID
+	ID     CommandID
 	Client *Client
-	Args []string
+	Args   []string
 }

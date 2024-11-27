@@ -1,27 +1,27 @@
 package chat
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
+	"net"
 	"strconv"
 	"strings"
-	"net"
-	"fmt"
-	"math/rand"
 )
 
 type Server struct {
-	Rooms map[string]*Room
+	Rooms    map[string]*Room
 	Commands chan Command
 }
 
 func NewServer() *Server {
-	srv := &Server {
-		Rooms: make(map[string]*Room),
+	srv := &Server{
+		Rooms:    make(map[string]*Room),
 		Commands: make(chan Command),
 	}
 
 	srv.Rooms["main"] = &Room{
-		Name: "main",
+		Name:    "main",
 		Members: make(map[net.Addr]*Client),
 	}
 
@@ -32,15 +32,15 @@ func (srv *Server) NewClient(conn net.Conn) {
 	log.Printf("New connection from %s", conn.RemoteAddr())
 
 	c := &Client{
-		Conn: conn,
-		Nick: "Guest"+strconv.Itoa(rand.Intn(10000)),
+		Conn:     conn,
+		Nick:     "Guest" + strconv.Itoa(rand.Intn(10000)),
 		Commands: srv.Commands,
 	}
 
 	c.Commands <- Command{
-		ID: CmdRoom,
+		ID:     CmdRoom,
 		Client: c,
-		Args: []string{"/room", "main"},
+		Args:   []string{"/room", "main"},
 	}
 
 	c.readInput()
@@ -78,7 +78,7 @@ func (srv *Server) cmdNick(args []string, c *Client) {
 			}
 		}
 		if c.Room != nil {
-		c.Room.Broadcast(c, fmt.Sprintf("%s is now %s.", c.Nick, newNick))
+			c.Room.Broadcast(c, fmt.Sprintf("%s is now %s.", c.Nick, newNick))
 		}
 		c.Nick = newNick
 		c.Msg("You have been renamed.")
@@ -89,7 +89,7 @@ func (srv *Server) cmdNick(args []string, c *Client) {
 
 func (srv *Server) cmdRooms(_ []string, c *Client) {
 	c.Msg("Here's a list of all the rooms:")
-	for roomName, _ := range srv.Rooms {
+	for roomName := range srv.Rooms {
 		c.Msg(roomName)
 	}
 }
@@ -104,12 +104,12 @@ func (srv *Server) cmdRoom(args []string, c *Client) {
 
 	if !ok {
 		r = &Room{
-			Name: roomName,
+			Name:    roomName,
 			Members: make(map[net.Addr]*Client),
 		}
 
 		srv.Rooms[roomName] = r
-	} 
+	}
 
 	r.Members[c.Conn.RemoteAddr()] = c
 	srv.quitCurrentRoom(c)
@@ -119,7 +119,7 @@ func (srv *Server) cmdRoom(args []string, c *Client) {
 		fmt.Sprintf(
 			"You are now in %s. There are %d other users.",
 			r.Name,
-			len(r.Members) - 1, // One person in this room is the current client. Don't count them.
+			len(r.Members)-1, // One person in this room is the current client. Don't count them.
 		),
 	)
 }
@@ -158,4 +158,3 @@ func (srv *Server) quitCurrentRoom(c *Client) {
 		c.Room.Broadcast(c, fmt.Sprintf("%s has left the room.", c.Nick))
 	}
 }
-

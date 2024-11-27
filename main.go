@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"net"
 	"log"
+	"net"
 	"strconv"
 
 	"codeberg.org/Kaamkiya/tcparle/internal/chat"

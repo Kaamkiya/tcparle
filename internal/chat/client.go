@@ -2,16 +2,16 @@ package chat
 
 import (
 	"bufio"
-	"net"
 	"fmt"
+	"net"
 	"strings"
 )
 
 type Client struct {
-	Conn net.Conn
-	Nick string
-	Room *Room
-	Commands chan<-Command
+	Conn     net.Conn
+	Nick     string
+	Room     *Room
+	Commands chan<- Command
 }
 
 func (c *Client) readInput() {
@@ -41,42 +41,42 @@ func (c *Client) readInput() {
 		switch cmd {
 		case "/nick":
 			c.Commands <- Command{
-				ID: CmdNick,
+				ID:     CmdNick,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		case "/room":
 			c.Commands <- Command{
-				ID: CmdRoom,
+				ID:     CmdRoom,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		case "/rooms":
 			c.Commands <- Command{
-				ID: CmdRooms,
+				ID:     CmdRooms,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		case "/quit":
 			c.Commands <- Command{
-				ID: CmdQuit,
+				ID:     CmdQuit,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		case "/users":
 			c.Commands <- Command{
-				ID: CmdUsers,
+				ID:     CmdUsers,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		default:
 			if cmd[0] == '/' {
 				c.Err(fmt.Errorf("No such command %s", cmd))
 			} else {
 				c.Commands <- Command{
-					ID: CmdMsg,
+					ID:     CmdMsg,
 					Client: c,
-					Args: args,
+					Args:   args,
 				}
 			}
 		}
