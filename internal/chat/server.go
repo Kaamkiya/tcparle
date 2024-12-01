@@ -57,6 +57,8 @@ func (srv *Server) RunCommands() {
 			srv.cmdRoom(cmd.Args, cmd.Client)
 		case CmdRooms:
 			srv.cmdRooms(cmd.Args, cmd.Client)
+		case CmdDelRoom:
+			srv.cmdDelRoom(cmd.Args, cmd.Client)
 		case CmdMsg:
 			srv.cmdMsg(cmd.Args, cmd.Client)
 		case CmdUsers:
@@ -122,6 +124,27 @@ func (srv *Server) cmdRoom(args []string, c *Client) {
 			len(r.Members)-1, // One person in this room is the current client. Don't count them.
 		),
 	)
+}
+
+func (srv *Server) cmdDelRoom(args []string, c *Client) {
+	if len(args) < 2 {
+		c.Err(fmt.Errorf("Usage: /delroom [room]"))
+		return
+	}
+	
+	r, ok := srv.Rooms[args[1]]
+
+	if !ok {
+		c.Err(fmt.Errorf("No such room."))
+		return
+	}
+
+	if len(r.Members) == 0 {
+		delete(srv.Rooms, r.Name)
+	} else {
+		c.Err(fmt.Errorf("There are still people in that room."))
+	}
+	return
 }
 
 func (srv *Server) cmdQuit(args []string, c *Client) {

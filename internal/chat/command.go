@@ -6,6 +6,7 @@ const (
 	CmdNick CommandID = iota
 	CmdRoom
 	CmdRooms
+	CmdDelRoom
 	CmdQuit
 	CmdMsg
 	CmdUsers
