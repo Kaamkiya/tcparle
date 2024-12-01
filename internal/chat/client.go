@@ -59,9 +59,9 @@ func (c *Client) readInput() {
 			}
 		case "/delroom":
 			c.Commands <- Command{
-				ID: CmdDelRoom,
+				ID:     CmdDelRoom,
 				Client: c,
-				Args: args,
+				Args:   args,
 			}
 		case "/quit":
 			c.Commands <- Command{

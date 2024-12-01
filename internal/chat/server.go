@@ -131,7 +131,7 @@ func (srv *Server) cmdDelRoom(args []string, c *Client) {
 		c.Err(fmt.Errorf("Usage: /delroom [room]"))
 		return
 	}
-	
+
 	r, ok := srv.Rooms[args[1]]
 
 	if !ok {
