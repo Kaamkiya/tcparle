@@ -139,6 +139,10 @@ func (srv *Server) cmdDelRoom(args []string, c *Client) {
 		return
 	}
 
+	if r.Name == "main" {
+		c.Err(fmt.Errorf("Cannot delete main."))
+	}
+
 	if len(r.Members) == 0 {
 		delete(srv.Rooms, r.Name)
 	} else {

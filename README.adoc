@@ -16,6 +16,7 @@ Currently, it's built entirely with just the standard library.
 * `/room [room]`: Join a room. Rooms will be created if they do not exist. If
   no arguments are given, it will print your current room.
 * `/rooms`: List all rooms.
+* `/delroom [room]`: Deletes a room if it is empty.
 * `/nick [name]`: Change your display name.
 * `/quit`: Leave the chat
 
@@ -26,7 +27,6 @@ your room.
 
 * Color the usernames
 * Add a `/help` command
-* Delete empty rooms (except main)
 * Validate room names
 * Add a prompt with this format: `[user]:`
 * Make a `/typing` command that gives a typing test and broadcasts user's
