@@ -3,7 +3,7 @@ package chat
 import (
 	"fmt"
 	"log"
-	"math/rand"
+	"math/rand/v2"
 	"net"
 	"strconv"
 	"strings"
@@ -33,7 +33,7 @@ func (srv *Server) NewClient(conn net.Conn) {
 
 	c := &Client{
 		Conn:     conn,
-		Nick:     "Guest" + strconv.Itoa(rand.Intn(10000)),
+		Nick:     "Guest" + strconv.Itoa(rand.IntN(100000)),
 		Commands: srv.Commands,
 	}
 
