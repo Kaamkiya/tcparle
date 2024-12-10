@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-type Client struct {
-	Conn     net.Conn
-	Nick     string
-	Room     *Room
-	Commands chan<- Command
+type client struct {
+	conn     net.Conn
+	nick     string
+	room     *room
+	commands chan<- command
 }
 
-func (c *Client) readInput() {
-	reader := bufio.NewReader(c.Conn)
+func (c *client) readInput() {
+	reader := bufio.NewReader(c.conn)
 
 	for {
 		msg, err := reader.ReadString('\n')
@@ -40,59 +40,59 @@ func (c *Client) readInput() {
 
 		switch cmd {
 		case "/nick":
-			c.Commands <- Command{
-				ID:     CmdNick,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdNick,
+				client: c,
+				args:   args,
 			}
 		case "/room":
-			c.Commands <- Command{
-				ID:     CmdRoom,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdRoom,
+				client: c,
+				args:   args,
 			}
 		case "/rooms":
-			c.Commands <- Command{
-				ID:     CmdRooms,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdRooms,
+				client: c,
+				args:   args,
 			}
 		case "/delroom":
-			c.Commands <- Command{
-				ID:     CmdDelRoom,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdDelRoom,
+				client: c,
+				args:   args,
 			}
 		case "/quit":
-			c.Commands <- Command{
-				ID:     CmdQuit,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdQuit,
+				client: c,
+				args:   args,
 			}
 		case "/users":
-			c.Commands <- Command{
-				ID:     CmdUsers,
-				Client: c,
-				Args:   args,
+			c.commands <- command{
+				id:     CmdUsers,
+				client: c,
+				args:   args,
 			}
 		default:
 			if cmd[0] == '/' {
-				c.Err(fmt.Errorf("No such command %s", cmd))
+				c.err(fmt.Errorf("No such command %s", cmd))
 			} else {
-				c.Commands <- Command{
-					ID:     CmdMsg,
-					Client: c,
-					Args:   args,
+				c.commands <- command{
+					id:     CmdMsg,
+					client: c,
+					args:   args,
 				}
 			}
 		}
 	}
 }
 
-func (c *Client) Err(err error) {
-	c.Conn.Write([]byte(err.Error() + "\n"))
+func (c *client) err(err error) {
+	c.conn.Write([]byte(err.Error() + "\n"))
 }
 
-func (c *Client) Msg(msg string) {
-	c.Conn.Write([]byte(msg + "\n"))
+func (c *client) msg(msg string) {
+	c.conn.Write([]byte(msg + "\n"))
 }

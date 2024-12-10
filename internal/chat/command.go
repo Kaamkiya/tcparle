@@ -1,9 +1,9 @@
 package chat
 
-type CommandID int
+type commandID int
 
 const (
-	CmdNick CommandID = iota
+	CmdNick commandID = iota
 	CmdRoom
 	CmdRooms
 	CmdDelRoom
@@ -12,8 +12,8 @@ const (
 	CmdUsers
 )
 
-type Command struct {
-	ID     CommandID
-	Client *Client
-	Args   []string
+type command struct {
+	id     commandID
+	client *client
+	args   []string
 }

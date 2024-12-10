@@ -9,65 +9,65 @@ import (
 	"strings"
 )
 
-type Server struct {
-	Rooms    map[string]*Room
-	Commands chan Command
+type server struct {
+	rooms    map[string]*room
+	commands chan command
 }
 
-func NewServer() *Server {
-	srv := &Server{
-		Rooms:    make(map[string]*Room),
-		Commands: make(chan Command),
+func NewServer() *server {
+	srv := &server{
+		rooms:    make(map[string]*room),
+		commands: make(chan command),
 	}
 
-	srv.Rooms["main"] = &Room{
+	srv.rooms["main"] = &room{
 		Name:    "main",
-		Members: make(map[net.Addr]*Client),
+		Members: make(map[net.Addr]*client),
 	}
 
 	return srv
 }
 
-func (srv *Server) NewClient(conn net.Conn) {
+func (srv *server) NewClient(conn net.Conn) {
 	log.Printf("New connection from %s", conn.RemoteAddr())
 
-	c := &Client{
-		Conn:     conn,
-		Nick:     "Guest" + strconv.Itoa(rand.IntN(100000)),
-		Commands: srv.Commands,
+	c := &client{
+		conn:     conn,
+		nick:     "Guest" + strconv.Itoa(rand.IntN(100000)),
+		commands: srv.commands,
 	}
 
-	c.Commands <- Command{
-		ID:     CmdRoom,
-		Client: c,
-		Args:   []string{"/room", "main"},
+	c.commands <- command{
+		id:     CmdRoom,
+		client: c,
+		args:   []string{"/room", "main"},
 	}
 
 	c.readInput()
 }
 
-func (srv *Server) RunCommands() {
-	for cmd := range srv.Commands {
-		switch cmd.ID {
+func (srv *server) RunCommands() {
+	for cmd := range srv.commands {
+		switch cmd.id {
 		case CmdNick:
-			srv.cmdNick(cmd.Args, cmd.Client)
+			srv.cmdNick(cmd.args, cmd.client)
 		case CmdQuit:
-			srv.cmdQuit(cmd.Args, cmd.Client)
+			srv.cmdQuit(cmd.args, cmd.client)
 		case CmdRoom:
-			srv.cmdRoom(cmd.Args, cmd.Client)
+			srv.cmdRoom(cmd.args, cmd.client)
 		case CmdRooms:
-			srv.cmdRooms(cmd.Args, cmd.Client)
+			srv.cmdRooms(cmd.args, cmd.client)
 		case CmdDelRoom:
-			srv.cmdDelRoom(cmd.Args, cmd.Client)
+			srv.cmdDelroom(cmd.args, cmd.client)
 		case CmdMsg:
-			srv.cmdMsg(cmd.Args, cmd.Client)
+			srv.cmdMsg(cmd.args, cmd.client)
 		case CmdUsers:
-			srv.cmdUsers(cmd.Args, cmd.Client)
+			srv.cmdUsers(cmd.args, cmd.client)
 		}
 	}
 }
 
-func (srv *Server) cmdNick(args []string, c *Client) {
+func (srv *server) cmdNick(args []string, c *client) {
 	if len(args) == 2 {
 		newNick := args[1]
 		for _, char := range newNick {
@@ -75,49 +75,49 @@ func (srv *Server) cmdNick(args []string, c *Client) {
 				"qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890",
 				char,
 			) {
-				c.Err(fmt.Errorf("Nickname must consist of only numbers and letters."))
+				c.err(fmt.Errorf("Nickname must consist of only numbers and letters."))
 				return
 			}
 		}
-		if c.Room != nil {
-			c.Room.Broadcast(c, fmt.Sprintf("%s is now %s.", c.Nick, newNick))
+		if c.room != nil {
+			c.room.Broadcast(c, fmt.Sprintf("%s is now %s.", c.nick, newNick))
 		}
-		c.Nick = newNick
-		c.Msg("You have been renamed.")
+		c.nick = newNick
+		c.msg("You have been renamed.")
 	} else {
-		c.Err(fmt.Errorf("Usage: /nick [name]"))
+		c.err(fmt.Errorf("Usage: /nick [name]"))
 	}
 }
 
-func (srv *Server) cmdRooms(_ []string, c *Client) {
-	c.Msg("Here's a list of all the rooms:")
-	for roomName := range srv.Rooms {
-		c.Msg(roomName)
+func (srv *server) cmdRooms(_ []string, c *client) {
+	c.msg("Here's a list of all the rooms:")
+	for roomName := range srv.rooms {
+		c.msg(roomName)
 	}
 }
 
-func (srv *Server) cmdRoom(args []string, c *Client) {
+func (srv *server) cmdRoom(args []string, c *client) {
 	if len(args) < 2 {
-		c.Msg(fmt.Sprintf("You're currently in %s", c.Room.Name))
+		c.msg(fmt.Sprintf("You're currently in %s", c.room.Name))
 		return
 	}
 	roomName := args[1]
-	r, ok := srv.Rooms[roomName]
+	r, ok := srv.rooms[roomName]
 
 	if !ok {
-		r = &Room{
+		r = &room{
 			Name:    roomName,
-			Members: make(map[net.Addr]*Client),
+			Members: make(map[net.Addr]*client),
 		}
 
-		srv.Rooms[roomName] = r
+		srv.rooms[roomName] = r
 	}
 
-	r.Members[c.Conn.RemoteAddr()] = c
-	srv.quitCurrentRoom(c)
-	c.Room = r
-	r.Broadcast(c, fmt.Sprintf("%s has joined the room.", c.Nick))
-	c.Msg(
+	r.Members[c.conn.RemoteAddr()] = c
+	srv.quitCurrentroom(c)
+	c.room = r
+	r.Broadcast(c, fmt.Sprintf("%s has joined the room.", c.nick))
+	c.msg(
 		fmt.Sprintf(
 			"You are now in %s. There are %d other users.",
 			r.Name,
@@ -126,62 +126,61 @@ func (srv *Server) cmdRoom(args []string, c *Client) {
 	)
 }
 
-func (srv *Server) cmdDelRoom(args []string, c *Client) {
+func (srv *server) cmdDelroom(args []string, c *client) {
 	if len(args) < 2 {
-		c.Err(fmt.Errorf("Usage: /delroom [room]"))
+		c.err(fmt.Errorf("Usage: /delroom [room]"))
 		return
 	}
 
-	r, ok := srv.Rooms[args[1]]
+	r, ok := srv.rooms[args[1]]
 
 	if !ok {
-		c.Err(fmt.Errorf("No such room."))
+		c.err(fmt.Errorf("No such room."))
 		return
 	}
 
 	if r.Name == "main" {
-		c.Err(fmt.Errorf("Cannot delete main."))
+		c.err(fmt.Errorf("Cannot delete main."))
 	}
 
 	if len(r.Members) == 0 {
-		delete(srv.Rooms, r.Name)
+		delete(srv.rooms, r.Name)
 	} else {
-		c.Err(fmt.Errorf("There are still people in that room."))
+		c.err(fmt.Errorf("There are still people in that room."))
 	}
-	return
 }
 
-func (srv *Server) cmdQuit(args []string, c *Client) {
-	c.Msg("Goodbye.")
-	srv.quitCurrentRoom(c)
-	log.Printf("Client %s has disconnected.", c.Conn.RemoteAddr())
-	c.Conn.Close()
+func (srv *server) cmdQuit(args []string, c *client) {
+	c.msg("Goodbye.")
+	srv.quitCurrentroom(c)
+	log.Printf("Client %s has disconnected.", c.conn.RemoteAddr())
+	c.conn.Close()
 }
 
-func (srv *Server) cmdMsg(args []string, c *Client) {
-	if c.Room == nil {
-		c.Err(fmt.Errorf("You must be in a room."))
+func (srv *server) cmdMsg(args []string, c *client) {
+	if c.room == nil {
+		c.err(fmt.Errorf("You must be in a room."))
 		return
 	}
 
-	c.Room.Broadcast(c, c.Nick+": "+strings.Join(args, " "))
+	c.room.Broadcast(c, c.nick+": "+strings.Join(args, " "))
 }
 
-func (srv *Server) cmdUsers(args []string, c *Client) {
-	if c.Room == nil {
-		c.Err(fmt.Errorf("You must be in a room."))
+func (srv *server) cmdUsers(args []string, c *client) {
+	if c.room == nil {
+		c.err(fmt.Errorf("You must be in a room."))
 		return
 	}
 
-	c.Msg("Users: ")
-	for _, user := range c.Room.Members {
-		c.Msg(fmt.Sprintf("* %s", user.Nick))
+	c.msg("Users: ")
+	for _, user := range c.room.Members {
+		c.msg(fmt.Sprintf("* %s", user.nick))
 	}
 }
 
-func (srv *Server) quitCurrentRoom(c *Client) {
-	if c.Room != nil {
-		delete(c.Room.Members, c.Conn.RemoteAddr())
-		c.Room.Broadcast(c, fmt.Sprintf("%s has left the room.", c.Nick))
+func (srv *server) quitCurrentroom(c *client) {
+	if c.room != nil {
+		delete(c.room.Members, c.conn.RemoteAddr())
+		c.room.Broadcast(c, fmt.Sprintf("%s has left the room.", c.nick))
 	}
 }

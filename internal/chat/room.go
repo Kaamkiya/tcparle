@@ -2,15 +2,15 @@ package chat
 
 import "net"
 
-type Room struct {
+type room struct {
 	Name    string
-	Members map[net.Addr]*Client
+	Members map[net.Addr]*client
 }
 
-func (r *Room) Broadcast(sender *Client, msg string) {
+func (r *room) Broadcast(sender *client, msg string) {
 	for addr, member := range r.Members {
-		if addr != sender.Conn.RemoteAddr() {
-			member.Msg(msg)
+		if addr != sender.conn.RemoteAddr() {
+			member.msg(msg)
 		}
 	}
 }
