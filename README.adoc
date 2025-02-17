@@ -1,3 +1,16 @@
+= THIS PROJECT IS NO LONGER MAINTAINED.
+
+I hope to someday make a better version.
+
+Problems with this:
+
+. No moderation
+. Possible panic if two people use `/delroom` at the same time
+. No blocking
+. No account-type things (have to reset username everytime with no way to verify it)
+
+And more.
+
 = tcparle
 
 Chat over TCP. Name is TCP + "parle", which is French for talk.
